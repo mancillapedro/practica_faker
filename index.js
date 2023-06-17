@@ -1,14 +1,28 @@
 const { faker } = require('@faker-js/faker');
-const { format, getCheckDigit } = require('rut.js');
+const {
+    format,
+    // getCheckDigit
+} = require('rut.js');
 const CURRENT_DATE = new Date();
+
+const modulo11 = (rut_cuerpo) => {
+    // https://es.wikipedia.org/wiki/Rol_%C3%9Anico_Tributario
+    const
+        serie = [2, 3, 4, 5, 6, 7],
+        digit = 11 - (String(rut_cuerpo).split("").reverse().reduce(
+            (acc, digit, index) => acc + (digit * serie[index % 6]), 0) % 11)
+    return digit === 11 ? 0 : digit === 10 ? "K" : String(digit)
+}
 
 const getRut = () => {
     const
         MIN = 1_000_000,
         MAX = 30_999_999,
         randomNumber = String(Math.floor(Math.random() * (MAX - MIN + 1) + MIN))
-    return format(randomNumber + getCheckDigit(randomNumber))
+    // return format(randomNumber + getCheckDigit(randomNumber))
+    return format(randomNumber + modulo11(randomNumber))
 }
+
 const getAge = birthDate => {
     const
         years = CURRENT_DATE.getFullYear() - birthDate.getFullYear(),
