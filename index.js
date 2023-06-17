@@ -24,26 +24,25 @@ const getChileanCity = () => {
 
 const getPersonsByCity = persons_array => persons_array.reduce((acc, person) => {
     acc[person.city] ? (acc[person.city]++) : (acc[person.city] = 1)
-    return { ...acc }
+    return acc
 }, {})
 
-const persons = Array.from(
-    { length: 10 },
-    _ => {
-        const
-            birthDate = faker.date.birthdate(),
-            age = getAge(birthDate)
-        return {
-            id: faker.string.uuid(),
-            name: faker.person.fullName(),
-            birthDate,
-            age,
-            rut: getRut(),
-            // city: faker.location.city(),
-            city: getChileanCity()
-        }
+const newPerson = () => {
+    const
+        birthDate = faker.date.birthdate(),
+        age = getAge(birthDate)
+    return {
+        id: faker.string.uuid(),
+        name: faker.person.fullName(),
+        birthDate,
+        age,
+        rut: getRut(),
+        // city: faker.location.city(),
+        city: getChileanCity()
     }
-);
+}
+
+const persons = Array.from({ length: 10 }, newPerson);
 
 console.log(persons);
 console.log(getPersonsByCity(persons));
