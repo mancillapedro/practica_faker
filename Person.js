@@ -1,7 +1,5 @@
-const { faker } = require('@faker-js/faker');
-
 class Person {
-    #id = faker.string.uuid();
+    #id;
     #rut;
     #firstName;
     #lastName;
@@ -9,20 +7,22 @@ class Person {
     #sex;
     #city;
 
-    constructor(
+    constructor({
+        id,
         firstName,
         lastName,
         rut,
         city,
         birthDate,
         sex
-    ) {
-        this.#rut = rut ?? this.#randomRut(); // TODO: validation {valid rut}
-        this.#sex = sex ?? faker.person.sexType(); // TODO: validation {male | female}
-        this.#firstName = firstName ?? faker.person.firstName({ sex: this.#sex });
-        this.#lastName = lastName ?? faker.person.lastName({ sex: this.#sex });
-        this.#birthDate = birthDate ?? faker.date.birthdate();  // TODO: validation {type Date}
-        this.#city = city ?? this.#randomChileanCity();
+    }) {
+        this.#id = id
+        this.#rut = rut
+        this.#sex = sex
+        this.#firstName = firstName
+        this.#lastName = lastName
+        this.#birthDate = birthDate
+        this.#city = city
     }
 
     get id() { return this.#id; }
@@ -65,43 +65,6 @@ class Person {
             city: this.city
         }
     }
-    toString() {
-        return `personaaaa ${this.firstName}`
-    }
-
-    #randomRut() {
-        const {
-            format,
-            // getCheckDigit
-        } = require('rut.js');
-
-        /**
-        * @description https://es.wikipedia.org/wiki/Rol_%C3%9Anico_Tributario
-        * @param {Number} rut_cuerpo 
-        * @returns {String}
-        */
-        const modulo11 = (rut_cuerpo) => {
-            const
-                serie = [2, 3, 4, 5, 6, 7],
-                digit = 11 - (String(rut_cuerpo).split("").reverse().reduce(
-                    (acc, digit, index) => acc + (digit * serie[index % 6]), 0) % 11)
-            return digit === 11 ? '0' : digit === 10 ? "K" : String(digit)
-        }
-
-        const
-            MIN = 1_000_000,
-            MAX = 30_999_999,
-            randomNumber = Math.floor(Math.random() * (MAX - MIN + 1) + MIN)
-        // return format(randomNumber + getCheckDigit(String(randomNumber)))
-        return format(randomNumber + modulo11(randomNumber))
-    }
-
-    #randomChileanCity() {
-        const cities = ['Arica', 'Iquique', 'Antofagasta', 'Copiapó', 'La Serena', 'Valparaíso', 'Rancagua', 'Talca', 'Concepción', 'Temuco', 'Valdivia', 'Puerto Montt', 'Coyhaique', 'Punta Arenas']
-        return cities[Math.floor(Math.random() * cities.length)]
-    }
-
 }
-
 
 exports.Person = Person;
