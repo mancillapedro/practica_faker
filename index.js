@@ -1,66 +1,37 @@
-const { faker } = require('@faker-js/faker');
-const {
-    format,
-    // getCheckDigit
-} = require('rut.js');
+const { Person } = require('./Person.js');
 
-/**
- * @description https://es.wikipedia.org/wiki/Rol_%C3%9Anico_Tributario
- * @param {Number} rut_cuerpo 
- * @returns {String}
- */
-const modulo11 = (rut_cuerpo) => {
-    const
-        serie = [2, 3, 4, 5, 6, 7],
-        digit = 11 - (String(rut_cuerpo).split("").reverse().reduce(
-            (acc, digit, index) => acc + (digit * serie[index % 6]), 0) % 11)
-    return digit === 11 ? '0' : digit === 10 ? "K" : String(digit)
-}
+const personsInfo = persons_array => persons_array.forEach(person => console.log(person.info))
 
-const getRut = () => {
-    const
-        MIN = 1_000_000,
-        MAX = 30_999_999,
-        randomNumber = Math.floor(Math.random() * (MAX - MIN + 1) + MIN)
-    // return format(randomNumber + getCheckDigit(randomNumber))
-    return format(randomNumber + modulo11(randomNumber))
-}
+const personsByCities = persons_array => Object
+    .entries(
+        persons_array.reduce((acc, person) => {
+            acc[person.city] ? (acc[person.city]++) : (acc[person.city] = 1)
+            return acc
+        }, {})
 
-const getAge = birthDate => {
-    const
-        CURRENT_DATE = new Date(),
-        years = CURRENT_DATE.getFullYear() - birthDate.getFullYear(),
-        months = CURRENT_DATE.getMonth() - birthDate.getMonth()
-    return months < 0 || (months === 0 && CURRENT_DATE.getDate() < birthDate.getDate())
-        ? years - 1 : years
-}
+    )
+    .sort((a, b) => a[1] - b[1] || a[0].localeCompare(b[0]))
+    .reduce((acc, [city, amount]) => {
+        acc[city] = amount
+        return acc
+    }, {})
 
-const getChileanCity = () => {
-    const cities = ['Arica', 'Iquique', 'Antofagasta', 'Copiapó', 'La Serena', 'Valparaíso', 'Rancagua', 'Talca', 'Concepción', 'Temuco', 'Valdivia', 'Puerto Montt', 'Coyhaique', 'Punta Arenas']
-    return cities[Math.floor(Math.random() * cities.length)]
-}
 
-const getPersonsByCity = persons_array => persons_array.reduce((acc, person) => {
-    acc[person.city] ? (acc[person.city]++) : (acc[person.city] = 1)
+const averageAgeOfPersons = persons_array =>
+    persons_array.reduce((total, person) => total + person.age, 0) / persons_array.length
+
+
+const personsBySex = persons_array => persons_array.reduce((acc, person) => {
+    acc[person.sex] ? (acc[person.sex]++) : (acc[person.sex] = 1)
     return acc
 }, {})
 
-const newPerson = () => {
-    const
-        birthDate = faker.date.birthdate(),
-        age = getAge(birthDate)
-    return {
-        id: faker.string.uuid(),
-        name: faker.person.fullName(),
-        birthDate,
-        age,
-        rut: getRut(),
-        // city: faker.location.city(),
-        city: getChileanCity()
-    }
-}
 
-const persons = Array.from({ length: 10 }, newPerson);
+const arrayOfPersons = amount => Array.from({ length: amount }, () => new Person());
 
-console.log(persons);
-console.log(getPersonsByCity(persons));
+const persons = arrayOfPersons(10);
+
+personsInfo(persons)
+console.log(personsByCities(persons));
+console.log(averageAgeOfPersons(persons));
+console.log(personsBySex(persons));
