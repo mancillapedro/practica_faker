@@ -10,13 +10,12 @@ const personsByCities = persons_array => Object
             acc[person.city] ? (acc[person.city]++) : (acc[person.city] = 1)
             return acc
         }, {})
-
     )
     .sort((a, b) => a[1] - b[1] || a[0].localeCompare(b[0]))
     .reduce((acc, [city, amount]) => {
-        acc[city] = amount
+        acc.set(city, amount)
         return acc
-    }, {})
+    }, new Map())
 
 const averageAgeOfPersons = persons_array =>
     persons_array.reduce((total, person) => total + person.age, 0) / persons_array.length
