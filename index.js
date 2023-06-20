@@ -1,6 +1,7 @@
 const { faker } = require('@faker-js/faker');
 const { format, getCheckDigit } = require('rut.js');
 const { Person } = require('./Person.js');
+const { PersonsArray } = require('./PersonsArray.js');
 
 const randomChileanCity = () => {
     const cities = ['Arica', 'Iquique', 'Antofagasta', 'Copiapó', 'La Serena', 'Valparaíso', 'Rancagua', 'Talca', 'Concepción', 'Temuco', 'Valdivia', 'Puerto Montt', 'Coyhaique', 'Punta Arenas']
@@ -15,7 +16,7 @@ const randomRut = () => {
     return format(randomNumber + getCheckDigit(String(randomNumber)))
 }
 
-const arrayOfPersons = amount => Array.from(
+const arrayOfPersons = amount => PersonsArray.from(
     { length: amount },
     () => {
         const sex = faker.person.sexType()
@@ -31,32 +32,9 @@ const arrayOfPersons = amount => Array.from(
     }
 );
 
-const personsInfo = persons_array => persons_array.map(({ info }) => info)
-
-const personsByCities = persons_array => Object
-    .entries(
-        persons_array.reduce((acc, { city }) => {
-            acc[city] ? (acc[city]++) : (acc[city] = 1)
-            return acc
-        }, {})
-    )
-    .sort((a, b) => a[1] - b[1] || a[0].localeCompare(b[0]))
-    .reduce((acc, [city, amount]) => {
-        acc.set(city, amount)
-        return acc
-    }, new Map())
-
-const averageAgeOfPersons = persons_array =>
-    persons_array.reduce((total, { age }) => total + age, 0) / persons_array.length
-
-const personsBySex = persons_array => persons_array.reduce((acc, { sex }) => {
-    acc[sex] ? (acc[sex]++) : (acc[sex] = 1)
-    return acc
-}, {})
-
 const persons = arrayOfPersons(10);
 
-console.log("Listado de personas", personsInfo(persons))
-console.log("\nPersonas por ciudades", personsByCities(persons));
-console.log("\nPromedio de edades", averageAgeOfPersons(persons));
-console.log("\nPersonas por cada sexo", personsBySex(persons));
+console.log("Listado de personas", persons.info())
+console.log("\nPersonas por ciudades", persons.byCities());
+console.log("\nPromedio de edades", persons.averageAge());
+console.log("\nPersonas por cada sexo", persons.bySex());
